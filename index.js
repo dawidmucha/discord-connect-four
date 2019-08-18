@@ -47,8 +47,6 @@ client.on('message', msg => {
 		msg.channel.send("Initializing the game!");
 		
 		currentGame = emptyField
-		console.log('currentGame', currentGame)
-		console.log('emptyField', emptyField)
 		populateFieldString()
 
 		msg.channel.send(fieldString);
@@ -68,43 +66,122 @@ client.on('message', msg => {
 				break falling_block
 			}
 			else if(currentGame[falling + 1] === undefined || currentGame[falling + 1][column] !== 0) {
-				console.log(emptyField)
 				currentGame[falling][column] = color
-				console.log(emptyField)
 				fallingFlag = true
 			} else falling++
 		} while(falling <= 5 && !fallingFlag)
 
 		// CHECKING FOR MATCH
-		let match = false
-		let matches = [false, false, false, false] // S N E W
+		let matchesPossible = [false, false, false, false]
+		let matchesAcc = [0, 0, 0, 0]	// ↕ ↔ ⤢ ⤡
 
-		// N - f3-5 | E - c0-3 | W - c3-5 | S - f0-2
-		if(falling >= 0 && falling <= 2) matches[0] = true // S match
-		if(falling >= 3 && falling <= 5) matches[1] = true // N match
-		if(column >= 0 && column <= 3) matches[2] = true // E match
-		if(column >= 3 && column <= 5) matches[3] = true // W match
+		if(falling >= 0 && falling <= 2) matchesPossible[0] = true // S match possible
+		if(falling >= 3 && falling <= 5) matchesPossible[1] = true // N match possible
+		if(column >= 0 && column <= 3) matchesPossible[2] = true // E match possible
+		if(column >= 3 && column <= 6) matchesPossible[3] = true // W match possible
 
-		if(matches[0]) { // S match
-			if(currentGame[falling][column] === currentGame[falling+1][column] && currentGame[falling][column] === currentGame[falling+2][column] && currentGame[falling][column] === currentGame[falling+3][column] && currentGame[falling][column] === currentGame[falling+4][column]) match = true
+		// CHECK ↓ S
+		if(currentGame[falling+1] != undefined && currentGame[falling][column] === currentGame[falling+1][column]) {
+			matchesAcc[0]++
+			if(currentGame[falling+2] != undefined && currentGame[falling][column] === currentGame[falling+2][column]) {
+				matchesAcc[0]++
+				if(currentGame[falling+3] != undefined && currentGame[falling][column] === currentGame[falling+3][column]) {
+					matchesAcc[0]++
+				}
+			}
 		}
-		if(matches[1]) { // N match
-			if(currentGame[falling][column] === currentGame[falling-1][column] && currentGame[falling][column] === currentGame[falling-2][column] && currentGame[falling][column] === currentGame[falling-3][column] && currentGame[falling][column] === currentGame[falling-4][column]) match = true
+		// CHECK ↑ N
+		if(currentGame[falling-1] != undefined && currentGame[falling][column] === currentGame[falling-1][column]) {
+			matchesAcc[0]++
+			if(currentGame[falling-2] != undefined && currentGame[falling][column] === currentGame[falling-2][column]) {
+				matchesAcc[0]++
+				if(currentGame[falling-3] != undefined && currentGame[falling][column] === currentGame[falling-3][column]) {
+					matchesAcc[0]++
+				}
+			}
 		}
-		if(matches[2]) { // E match
-			if(currentGame[falling][column] === currentGame[falling][column+1] && currentGame[falling][column] === currentGame[falling][column+2] && currentGame[falling][column] === currentGame[falling][column+3] && currentGame[falling][column] === currentGame[falling][column+4]) match = true
+		// CHECK → E
+		if(currentGame[falling][column] === currentGame[falling][column+1]) {
+			matchesAcc[1]++
+			if(currentGame[falling][column] === currentGame[falling][column+2]) {
+				matchesAcc[1]++
+				if(currentGame[falling][column] === currentGame[falling][column+3]) {
+					matchesAcc[1]++
+				}
+			}
 		}
-		if(matches[3]) { // W match
-			if(currentGame[falling][column] === currentGame[falling][column-1] && currentGame[falling][column] === currentGame[falling][column-2] && currentGame[falling][column] === currentGame[falling][column-3] && currentGame[falling][column] === currentGame[falling][column-4]) match = true
+		// CHECK ← W
+		if(currentGame[falling][column] === currentGame[falling][column-1]) {
+			matchesAcc[1]++
+			if(currentGame[falling][column] === currentGame[falling][column-2]) {
+				matchesAcc[1]++
+				if(currentGame[falling][column] === currentGame[falling][column-3]) {
+					matchesAcc[1]++
+				}
+			}
 		}
-		
-		
+		// CHECK ↘ SE
+		if(currentGame[falling+1] != undefined && currentGame[falling][column] === currentGame[falling+1][column+1]) {
+			matchesAcc[2]++
+			if(currentGame[falling+2] != undefined && currentGame[falling][column] === currentGame[falling+2][column+2]) {
+				matchesAcc[2]++
+				if(currentGame[falling+3] != undefined && currentGame[falling][column] === currentGame[falling+3][column+3]) {
+					matchesAcc[2]++
+				}
+			}
+		}
+		// CHECK ↙ SW
+		if(currentGame[falling+1] != undefined && currentGame[falling][column] === currentGame[falling+1][column-1]) {
+			matchesAcc[3]++
+			if(currentGame[falling+2] != undefined && currentGame[falling][column] === currentGame[falling+2][column-2]) {
+				matchesAcc[3]++
+				if(currentGame[falling+3] != undefined && currentGame[falling][column] === currentGame[falling+3][column-3]) {
+					matchesAcc[3]++
+				}
+			}
+		}
+		// CHECK ↗ NE
+		if(currentGame[falling-1] != undefined && currentGame[falling][column] === currentGame[falling-1][column+1]) {
+			matchesAcc[3]++
+			if(currentGame[falling-2] != undefined && currentGame[falling][column] === currentGame[falling-2][column+2]) {
+				matchesAcc[3]++
+				if(currentGame[falling-3] != undefined && currentGame[falling][column] === currentGame[falling-3][column+3]) {
+					matchesAcc[3]++
+				}
+			}
+		}
+		// CHECK ↖ NW
+		if(currentGame[falling-1] != undefined && currentGame[falling][column] === currentGame[falling-1][column-1]) {
+			matchesAcc[2]++
+			if(currentGame[falling-2] != undefined && currentGame[falling][column] === currentGame[falling-2][column-2]) {
+				matchesAcc[2]++
+				if(currentGame[falling-3] != undefined && currentGame[falling][column] === currentGame[falling-3][column-3]) {
+					matchesAcc[2]++
+				}
+			}
+		}
+
+		if(matchesAcc.filter(match => match === 3).length > 0) console.log('fooken match, nice mate!')
 		// PRINGING THE BOARD
 		populateFieldString()
-		msg.channel.send(fieldString);
+		msg.channel.send(fieldString)
 
-		msg.channel.send(`${color === 1 ? 'red' : 'blue'} disc placed on column ${column+1}!`);
+		msg.channel.send(`${color === 1 ? 'red' : 'blue'} disc placed on column ${column+1}!`)
 	}
-});
 
-client.login(process.env.TOKEN);
+	if(msg.content === '!cf dupa') { // GAME INITIALIZATION
+		currentGame = [
+			[0, 1, 0, 0, 0, 1, 0],
+			[0, 2, 1, 0, 1, 2, 0],
+			[1, 1, 1, 0, 1, 1, 1],
+			[2, 2, 1, 1, 1, 2, 2],
+			[2, 1, 2, 1, 2, 1, 2],
+			[1, 2, 2, 1, 2, 2, 1]
+		]
+		populateFieldString()
+
+		msg.channel.send(fieldString);
+	}
+})
+
+client.login(process.env.TOKEN)
