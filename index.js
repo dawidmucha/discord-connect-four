@@ -43,7 +43,17 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  if(msg.content === '!cf start') { // GAME INITIALIZATION
+	if(msg.content === '!cf help') {
+		msg.channel.send("Hi! I'm Connec Four bot. With my help, you can, well, play connect four")
+		msg.channel.send(
+			`Commands:\n
+			\`!cf help\` - all info found here\n
+			\`!cf start\` - resets the current board to an empty one, so you can play from the start\n
+			\`!cf [color] [column]\` - for example \`!cf red 1\` or \`!cf blue 5\`. Places a disc of given color to a selected column. Every column is labeled above.
+		`)
+	}
+
+  else if(msg.content === '!cf start') { // GAME INITIALIZATION
 		msg.channel.send("Initializing the game!");
 		
 		currentGame = emptyField
@@ -161,26 +171,15 @@ client.on('message', msg => {
 			}
 		}
 
-		if(matchesAcc.filter(match => match === 3).length > 0) console.log('fooken match, nice mate!')
+
 		// PRINGING THE BOARD
 		populateFieldString()
 		msg.channel.send(fieldString)
 
-		msg.channel.send(`${color === 1 ? 'red' : 'blue'} disc placed on column ${column+1}!`)
-	}
-
-	if(msg.content === '!cf dupa') { // GAME INITIALIZATION
-		currentGame = [
-			[0, 1, 0, 0, 0, 1, 0],
-			[0, 2, 1, 0, 1, 2, 0],
-			[1, 1, 1, 0, 1, 1, 1],
-			[2, 2, 1, 1, 1, 2, 2],
-			[2, 1, 2, 1, 2, 1, 2],
-			[1, 2, 2, 1, 2, 2, 1]
-		]
-		populateFieldString()
-
-		msg.channel.send(fieldString);
+		if(matchesAcc.filter(match => match === 3).length > 0) { // if a match
+			msg.channel.send(`Congratulations ${msg.author.username}! You won!`)
+			currentGame = emptyField
+		}
 	}
 })
 
