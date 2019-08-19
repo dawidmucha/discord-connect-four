@@ -10,6 +10,9 @@ const emptyField = [
 ]
 let currentGame = emptyField.map((arrEl) => arrEl.slice())
 let fieldString = '' // text message-friendly representation of current game field
+let isGameOn = false
+let isRedTurn = true
+let red, blue // objects containing users of given tile color
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -43,31 +46,69 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-	if(msg.content === '!cf help') {
+	messages: if(msg.content === '!cf help') {
 		msg.channel.send("Hi! I'm Connec Four bot. With my help, you can, well, play connect four")
-		msg.channel.send(
-			`Commands:\n
-			\`!cf help\` - all info found here\n
-			\`!cf start\` - resets the current board to an empty one, so you can play from the start\n
-			\`!cf [color] [column]\` - for example \`!cf red 1\` or \`!cf blue 5\`. Places a disc of given color to a selected column. Every column is labeled above.
+		msg.channel.send(`
+			Commands:\n
+			\`!cf help\` - All info found here\n
+			\`!cf start [user]\` - Starts a new game between the one who send a message and mentioned user. During game, only users currently playing can start a new game\n
+			\`!cf [1-7]\` - During game, if it's your turn, you can use that command to place disc of your color into selected row
 		`)
 	}
 
-  else if(msg.content === '!cf start') { // GAME INITIALIZATION
-		msg.channel.send("Initializing the game!");
+  else if(/^!cf start/.test(msg.content)) { // GAME INITIALIZATION
+		if(!isGameOn || red.id === msg.author.id || blue.id === msg.author.id) {
+			msg.channel.send("Initializing the game!");
+	
+			const rand = Math.floor(Math.random()*2)
+			if(rand) {
+				red = msg.mentions.users.first()
+				blue = msg.author
+			} else {
+				blue = msg.mentions.users.first()
+				red = msg.author
+			}
+			
+			if(!red || !blue) {
+				msg.channel.send('select an opponent, you dumbo')
+			} else if(red.id === blue.id) {
+				msg.channel.send('you cant play with yourself, you dumbo')
+			} else {
+				msg.channel.send(`A game between ${red.username}(:red_circle:) and ${blue.username}(:large_blue_circle:)`);
 		
-		currentGame = emptyField
-		populateFieldString()
-
-		msg.channel.send(fieldString);
-		msg.channel.send("Type '!cf red [number]' or '!cf blue [number]' to start!");
+				currentGame = emptyField.map((arrEl) => arrEl.slice())
+				populateFieldString()
+				isGameOn = true
+		
+				msg.channel.send(fieldString);
+				msg.channel.send(`${red.username}! Type \`!cf [1-7]\` to place your :red_circle: disc`);
+			}
+		} else console.log('game cant be started')
 	}
 
-	else if(/^!cf (red|blue) [1-7]$/.test(msg.content)) { // PLACING THE DISC
-		const color = msg.content.includes('red') ? 1 : 2
+	else if(/^!cf [1-7]$/.test(msg.content)) { // PLACING THE DISC
+		if(!isGameOn) {
+			msg.channel.send('There\'s no game currently being played. To use that command start a new game')
+			break messages
+		}
+		
+		const color = isRedTurn ? 1 : 2
 		const column = msg.content[msg.content.length - 1] - 1 // because arrays start at 0
 		let falling = 0 // a.k.a. 'row', but do...while gives it falling behaviour
 		let fallingFlag = false
+
+		// CHECKING IF USER IS CORRECT
+		if(isRedTurn) {
+			if(msg.author.id !== red.id) {
+				msg.channel.send(`It is ${red.username}'s turn. Let them make a move`)
+				break messages
+			}
+		} else {
+			if(msg.author.id !== blue.id) {
+				msg.channel.send(`It is ${blue.username}'s turn. Let them make a move`)
+				break messages
+			}
+		}
 
 		// PLACING THE DISC
 		falling_block: do {
@@ -90,6 +131,7 @@ client.on('message', msg => {
 		if(column >= 0 && column <= 3) matchesPossible[2] = true // E match possible
 		if(column >= 3 && column <= 6) matchesPossible[3] = true // W match possible
 
+		/* #region CHECKING DIRECTIONS */
 		// CHECK ↓ S
 		if(currentGame[falling+1] != undefined && currentGame[falling][column] === currentGame[falling+1][column]) {
 			matchesAcc[0]++
@@ -170,15 +212,20 @@ client.on('message', msg => {
 				}
 			}
 		}
-
+		/* #endregion */
 
 		// PRINGING THE BOARD
 		populateFieldString()
 		msg.channel.send(fieldString)
 
+		// CONSEQUENCES
 		if(matchesAcc.filter(match => match === 3).length > 0) { // if a match
-			msg.channel.send(`Congratulations ${msg.author.username}! You won!`)
-			currentGame = emptyField
+			msg.channel.send(`:tada: Congratulations ${msg.author.username}! You won! :tada:`)
+			currentGame = emptyField.map((arrEl) => arrEl.slice())
+			isGameOn = false
+		} else { // printing instructions for next turn
+			isRedTurn = !isRedTurn
+			msg.channel.send(`Now it's ${isRedTurn ? red.username : blue.username}'s turn! Type \`!cf [1-7]\` to place your ${isRedTurn ? ':red_circle:' : ':large_blue_circle:'} disc.`)
 		}
 	}
 })
