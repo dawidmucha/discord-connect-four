@@ -33,7 +33,7 @@ populateFieldString = () => {
 					break
 				
 				case 2: // blue circle
-					fieldString = fieldString.concat(':large_blue_circle: ')
+					fieldString = fieldString.concat(':blue_circle: ')
 					break
 			}
 		}
