@@ -1,4 +1,7 @@
 require('dotenv').config()
+const http = require('http')
+const port = process.env.PORT || 3000
+http.createServer().listen(port)
 
 const emptyField = [
 	[0, 0, 0, 0, 0, 0, 0],
@@ -228,6 +231,10 @@ client.on('message', msg => {
 			msg.channel.send(`Now it's ${isRedTurn ? red.username : blue.username}'s turn! Type \`!cf [1-7]\` to place your ${isRedTurn ? ':red_circle:' : ':blue_circle:'} disc.`)
 		}
 	}
+})
+
+client.on('error', err => {
+	console.log(err)
 })
 
 client.login(process.env.TOKEN)

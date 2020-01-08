@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.5.1",
-    "dotenv": "^8.0.0"
+    "dotenv": "file:node_modules/dotenv"
   },
   "devDependencies": {
     "nodemon": "^1.19.1"
