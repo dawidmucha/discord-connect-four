@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv/config')
 const http = require('http')
 const port = process.env.PORT || 3000
 http.createServer().listen(port)
