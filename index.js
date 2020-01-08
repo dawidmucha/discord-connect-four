@@ -74,7 +74,7 @@ client.on('message', msg => {
 			} else if(red.id === blue.id) {
 				msg.channel.send('you cant play with yourself, you dumbo')
 			} else {
-				msg.channel.send(`A game between ${red.username}(:red_circle:) and ${blue.username}(:large_blue_circle:)`);
+				msg.channel.send(`A game between ${red.username}(:red_circle:) and ${blue.username}(:blue_circle:)`);
 		
 				currentGame = emptyField.map((arrEl) => arrEl.slice())
 				populateFieldString()
@@ -225,7 +225,7 @@ client.on('message', msg => {
 			isGameOn = false
 		} else { // printing instructions for next turn
 			isRedTurn = !isRedTurn
-			msg.channel.send(`Now it's ${isRedTurn ? red.username : blue.username}'s turn! Type \`!cf [1-7]\` to place your ${isRedTurn ? ':red_circle:' : ':large_blue_circle:'} disc.`)
+			msg.channel.send(`Now it's ${isRedTurn ? red.username : blue.username}'s turn! Type \`!cf [1-7]\` to place your ${isRedTurn ? ':red_circle:' : ':blue_circle:'} disc.`)
 		}
 	}
 })
