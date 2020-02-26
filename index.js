@@ -1,7 +1,17 @@
-require('dotenv').config()
 const http = require('http')
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 8080
 http.createServer().listen(port)
+
+const express = require('express');
+const app = express();
+app.get("/", (request, response) => {
+  console.log(Date.now() + " Ping Received");
+  response.sendStatus(200);
+});
+
+setInterval(() => {
+  http.get(`http://${process.env.PROJECT_DOMAIN}.glitch.me/`);
+}, 280000);
 
 const emptyField = [
 	[0, 0, 0, 0, 0, 0, 0],
@@ -20,7 +30,7 @@ let red, blue // objects containing users of given tile color
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-populateFieldString = () => {
+const populateFieldString = () => {
 	fieldString = ''
 	fieldString = fieldString.concat(':one: :two: :three: :four: :five: :six: :seven:\n')
 

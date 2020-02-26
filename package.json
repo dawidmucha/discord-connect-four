@@ -1,25 +1,24 @@
 {
-  "name": "discord-connect-four",
+  "name": "samplejson",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A sample package.json",
+  "main": "node index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "discord.js": "^11.5.1",
-    "dotenv": "file:node_modules/dotenv"
-  },
-  "devDependencies": {
-    "nodemon": "^1.19.1"
+    "start": "node index.js"
   },
   "engines": {
-    "node": "10.15.3",
-    "npm": "6.4.1"
+    "node": "10.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Discord Bot Developments",
+  "license": "MIT",
+  "homepage": "",
+  "dependencies": {
+    "discord.js": "^11.4.5",
+    "express": "^4.15.5"
   }
 }
